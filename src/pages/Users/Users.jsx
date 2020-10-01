@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { getAllUsers } from "../../services/userService";
+import userService from "../../services/userService";
 
 class Users extends Component {
   state = {
@@ -7,7 +7,7 @@ class Users extends Component {
   };
 
   async componentDidMount() {
-    const users = await getAllUsers();
+    const users = await userService.getAllUsers();
     this.setState({ users });
   }
 

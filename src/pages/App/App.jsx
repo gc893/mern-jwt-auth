@@ -4,28 +4,39 @@ import NavBar from "../../components/NavBar/NavBar";
 import Signup from "../Signup/Signup";
 import Login from "../Login/Login";
 import authService from "../../services/authService";
+import userService from "../../services/userService";
 import Users from "../Users/Users";
 import "./App.css";
 
 class App extends Component {
   state = {
     user: authService.getUser(),
+    userData: null
   };
 
   handleLogout = () => {
     authService.logout();
-    this.setState({ user: null });
+    this.setState({ user: null, userData: null });
   };
 
-  handleSignupOrLogin = () => {
-    this.setState({ user: authService.getUser() });
+  handleSignupOrLogin = async () => {
+    let u = await authService.getUser();
+    let uData = await userService.getOne(u);
+    this.setState({ user: u, userData: uData });
   };
+
+  async componentDidMount() {
+    if (this.state.user) {
+      let uData = await userService.getOne(this.state.user);
+      this.setState({userData: uData})
+    }
+  }
 
   render() {
-    const {user} = this.state
+    const {userData} = this.state
     return (
       <>
-        <NavBar user={user} handleLogout={this.handleLogout} />
+        <NavBar user={userData} handleLogout={this.handleLogout} />
         <Route
           exact
           path="/"
@@ -58,7 +69,7 @@ class App extends Component {
         <Route
           exact
           path="/users"
-          render={() => (user ? <Users /> : <Redirect to="/login" />)}
+          render={() => (userData ? <Users /> : <Redirect to="/login" />)}
         />
       </>
     );
